@@ -20,10 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $telefono = $conn->real_escape_string($_POST['telefono']);
     $interes  = $conn->real_escape_string($_POST['interes']);
 
-    // Inserción directa solo con las columnas que existen en tu tabla de MariaDB
     $sql_insert = "INSERT INTO usuarios (nombre, correo, telefono, interes) VALUES ('$nombre', '$correo', '$telefono', '$interes')";
     $conn->query($sql_insert);
-    
+
     header("Location: index.php");
     exit();
 }
@@ -89,7 +88,6 @@ $result = $conn->query($sql);
     </div>
 
     <div class="container">
-        <!-- Columna Izquierda: Formulario -->
         <div class="card">
             <h2>📝 Nuevo Registro</h2>
             <form action="" method="POST">
@@ -118,7 +116,6 @@ $result = $conn->query($sql);
             </form>
         </div>
 
-        <!-- Columna Derecha: Tabla -->
         <div class="card card-table">
             <h2>📑 Usuarios Registrados (Servidor)</h2>
             <table>
@@ -156,6 +153,9 @@ $result = $conn->query($sql);
             </table>
         </div>
     </div>
+
+</body>
+</html>
 
 </body>
 </html>
