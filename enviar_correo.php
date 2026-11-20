@@ -2,11 +2,11 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-$host = getenv('MYSQLHOST') ?: getenv('DB_HOST') ?: 'gondola.proxy.rlwy.net';
-$user = getenv('MYSQLUSER') ?: getenv('DB_USER') ?: 'root';
-$pass = getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: 'CfnqFJthAzWFYgNgDDmrmNMWyjClhaHv';
-$db   = getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: 'railway';
-$port = (int)(getenv('MYSQLPORT') ?: getenv('DB_PORT') ?: 55448);
+$host = getenv('MYSQLHOST') ?: getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'gondola.proxy.rlwy.net');
+$user = getenv('MYSQLUSER') ?: getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
+$pass = getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? 'CfnqFJthAzWFYgNgDDmrmNMWyjClhaHv');
+$db   = getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'railway');
+$port = (int)(getenv('MYSQLPORT') ?: getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? 55448));
 
 $conn = new mysqli($host, $user, $pass, $db, $port);
 
@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 
 $smtpHost = trim(getenv('SMTP_HOST') ?: ($_ENV['SMTP_HOST'] ?? 'smtp.gmail.com'));
 $smtpPort = (int)(getenv('SMTP_PORT') ?: ($_ENV['SMTP_PORT'] ?? 587));
-$smtpUser = trim(getenv('SMTP_USER') ?: ($_ENV['SMTP_USER'] ?? 'enriquedejesusxd@gmail.com'));
+$smtpUser = trim(getenv('SMTP_USER') ?: ($_ENV['SMTP_USER'] ?? ''));
 $smtpPass = str_replace(' ', '', trim(getenv('SMTP_PASS') ?: ($_ENV['SMTP_PASS'] ?? '')));
 
 if ($smtpUser === '' || $smtpPass === '') {
@@ -139,6 +139,10 @@ if (isset($_GET['id'])) {
     }
     $stmt->close();
 }
+
+header("Location: index.php");
+exit();
+?>
 
 header("Location: index.php");
 exit();
