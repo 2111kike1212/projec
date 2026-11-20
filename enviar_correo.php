@@ -4,12 +4,13 @@ use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';
 
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "applocal_db";
+$host = getenv('MYSQLHOST') ?: getenv('DB_HOST') ?: 'gondola.proxy.rlwy.net';
+$user = getenv('MYSQLUSER') ?: getenv('DB_USER') ?: 'root';
+$pass = getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: 'CfnqFJthAzWFYgNgDDmrmNMWyjClhaHv';
+$db   = getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: 'railway';
+$port = (int)(getenv('MYSQLPORT') ?: getenv('DB_PORT') ?: 55448);
 
-$conn = new mysqli($host, $user, $pass, $db);
+$conn = new mysqli($host, $user, $pass, $db, $port);
 
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
@@ -47,12 +48,12 @@ if (isset($_GET['id'])) {
 
             $mail->send();
         } catch (Exception $e) {
-           echo "Error detallado de PHPMailer: {$mail->ErrorInfo}";
+            echo "Error detallado de PHPMailer: {$mail->ErrorInfo}";
             exit();
         }
     }
 }
 
 header("Location: index.php");
-exit()
+exit();
 ?>
