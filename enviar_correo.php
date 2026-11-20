@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-$resendApiKey = getenv('RESEND_API_KEY') ?: 're_CxjRzLTi_Q5Y1VthoE2FQ6qHyrmLHRBh6';
+$resendApiKey = getenv('RESEND_API_KEY') ?: 're_bbEPd5AY_2Yz1Hqy99PB3g4mw4gc5WGtX';
 $fromEmail    = getenv('MAIL_FROM') ?: 'onboarding@resend.dev';
 
 if (isset($_GET['id'])) {
