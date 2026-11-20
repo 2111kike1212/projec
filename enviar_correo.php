@@ -14,42 +14,39 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-$resendApiKey = trim(
-    getenv('RESEND_API_KEY') ?: ($_ENV['RESEND_API_KEY'] ?? ($_SERVER['RESEND_API_KEY'] ?? ''))
+$scriptUrl = trim(
+    getenv('APPS_SCRIPT_URL') ?: ($_ENV['APPS_SCRIPT_URL'] ?? ($_SERVER['APPS_SCRIPT_URL'] ?? ''))
 );
 
-if ($resendApiKey === '') {
-    die("Error: RESEND_API_KEY está vacía o no se cargó en Render.");
+if ($scriptUrl === '') {
+    die("Error: APPS_SCRIPT_URL está vacía o no se cargó en Render.");
 }
-
-$fromEmail = trim(
-    getenv('MAIL_FROM') ?: ($_ENV['MAIL_FROM'] ?? ($_SERVER['MAIL_FROM'] ?? 'onboarding@resend.dev'))
-);
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
 
-    $sql = "SELECT * FROM usuarios WHERE id = $id";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT nombre, correo, interes FROM usuarios WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
 
         $payload = [
-            'from'    => "DataSync Pro <{$fromEmail}>",
-            'to'      => [$row['correo']],
+            'to'      => $row['correo'],
             'subject' => 'Notificacion desde DataSync Pro',
-            'html'    => "Hola <b>" . htmlspecialchars($row['nombre']) . "</b>,<br><br>" .
+            'html'    => "Hola <b>" . htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') . "</b>,<br><br>" .
                          "Este es el mensaje enviado desde el sistema DataSync Pro.<br>" .
-                         "Area de interes registrada: <b>" . htmlspecialchars($row['interes']) . "</b><br><br>" .
+                         "Area de interes registrada: <b>" . htmlspecialchars($row['interes'], ENT_QUOTES, 'UTF-8') . "</b><br><br>" .
                          "¡Gracias por utilizar nuestro sistema!"
         ];
 
-        $ch = curl_init('https://api.resend.com/emails');
+        $ch = curl_init($scriptUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Bearer ' . $resendApiKey,
             'Content-Type: application/json'
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
@@ -69,6 +66,7 @@ if (isset($_GET['id'])) {
             exit();
         }
     }
+    $stmt->close();
 }
 
 header("Location: index.php");
