@@ -14,8 +14,17 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-$resendApiKey = getenv('RESEND_API_KEY') ?: 're_bbEPd5AY_2Yz1Hqy99PB3g4mw4gc5WGtX';
-$fromEmail    = getenv('MAIL_FROM') ?: 'onboarding@resend.dev';
+$resendApiKey = trim(
+    getenv('RESEND_API_KEY') ?: ($_ENV['RESEND_API_KEY'] ?? ($_SERVER['RESEND_API_KEY'] ?? ''))
+);
+
+if ($resendApiKey === '') {
+    die("Error: RESEND_API_KEY está vacía o no se cargó en Render.");
+}
+
+$fromEmail = trim(
+    getenv('MAIL_FROM') ?: ($_ENV['MAIL_FROM'] ?? ($_SERVER['MAIL_FROM'] ?? 'onboarding@resend.dev'))
+);
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -45,8 +54,8 @@ if (isset($_GET['id'])) {
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $response  = curl_exec($ch);
+        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlError = curl_error($ch);
         curl_close($ch);
 
